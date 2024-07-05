@@ -1,0 +1,1 @@
+var tipuesearch = {"pages": [{'title': 'About', 'text': "C4:  https://en.wikipedia.org/wiki/C_(musical_note) \n from musthe import *\nprint(Chord(Note('C')).notes) \n Result: \n [Note('C4'), Note('E4'), Note('G4')] \n 設法轉為 Brython", 'tags': '', 'url': 'About.html'}]};
