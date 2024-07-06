@@ -5,3 +5,19 @@ print(Chord(Note('C')).notes)</pre>
 <p>Result:</p>
 <p>[Note('C4'), Note('E4'), Note('G4')]</p>
 <p>設法轉為 Brython</p>
+<h1>Python</h1>
+<p>Python 3.12.3 無法單獨使用 pip install, 而要使用 python -m pip install</p>
+<p>init_replit 成為:</p>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">#!/bin/bash
+
+# Update Git submodules
+git submodule update --init
+
+# Install Python packages using pip
+python -m pip install flask flask_cors bs4 lxml pelican markdown gevent
+
+# Optionally, you can add more commands or customizations here.
+</pre>
+<p></p>
+<p></p>
+<p></p>
