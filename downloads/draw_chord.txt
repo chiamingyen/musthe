@@ -1,0 +1,132 @@
+# 導入必要的模塊
+from browser import document, html, console
+from musthe import *
+
+# 先處理音符轉換流程
+def get_notes(notes):
+    output = []
+    for i in notes:
+        output.append(str(i) + str(i.octave))
+    return output
+
+# 創建畫布元素
+canvas = html.CANVAS(width=800, height=800)
+# 設置畫布的ID
+canvas.id = "keyboard"
+# 獲取Brython的div元素
+brython_div = document["brython_div1"]
+# 將畫布添加到Brython的div中
+brython_div <= canvas
+# 獲取畫布的2D繪圖上下文
+ctx = canvas.getContext("2d")
+
+# 定義鍵盤尺寸
+key_width = 20  # 每個鍵的寬度
+white_key_height = 300  # 白鍵的高度
+black_key_height = 200  # 黑鍵的高度
+total_keys = 61  # 鍵盤上的總鍵數
+
+# 設置畫布的實際大小
+canvas.width = key_width * 35
+canvas.height = white_key_height + 20
+
+# 定義鍵的模式
+white_key_pattern = [0, 2, 4, 5, 7, 9, 11]  # 白鍵在八度音階中的位置
+black_key_pattern = [1, 3, 6, 8, 10]  # 黑鍵在八度音階中的位置
+
+# 定義繪製單個鍵的函數
+def draw_key(x, y, width, height, is_black, fill_color=None):
+    # 開始一個新的繪圖路徑
+    ctx.beginPath()
+    # 繪製矩形（鍵）
+    ctx.rect(x, y, width, height)
+    # 設置填充顏色
+    if fill_color:
+        ctx.fillStyle = fill_color
+    else:
+        ctx.fillStyle = "black" if is_black else "white"
+    # 填充矩形
+    ctx.fill()
+    # 設置描邊顏色為黑色
+    ctx.strokeStyle = "black"
+    # 繪製描邊
+    ctx.stroke()
+
+# 定義繪製整個鍵盤的函數
+def draw_keyboard(chord_notes=None):
+    # 定義音符位置的字典
+    note_positions1 = {0: 'C2', 1: 'Db2', 2: 'D2', 3: 'Eb2', 4: 'E2', 5: 'F2', 6: 'Gb2', 7: 'G2', 
+        8: 'Ab2', 9: 'A2', 10: 'Bb2', 11: 'B2', 12: 'C3', 13: 'Db3', 14: 'D3', 15: 'Eb3', 
+        16: 'E3', 17: 'F3', 18: 'Gb3', 19: 'G3', 20: 'Ab3', 21: 'A3', 22: 'Bb3', 23: 'B3', 
+        24: 'C4', 25: 'Db4', 26: 'D4', 27: 'Eb4', 28: 'E4', 29: 'F4', 30: 'Gb4', 31: 'G4', 
+        32: 'Ab4', 33: 'A4', 34: 'Bb4', 35: 'B4', 36: 'C5', 37: 'Db5', 38: 'D5', 39: 'Eb5', 
+        40: 'E5', 41: 'F5', 42: 'Gb5', 43: 'G5', 44: 'Ab5', 45: 'A5', 46: 'Bb5', 47: 'B5', 
+        48: 'C6', 49: 'Db6', 50: 'D6', 51: 'Eb6', 52: 'E6', 53: 'F6', 54: 'Gb6', 55: 'G6', 
+        56: 'Ab6', 57: 'A6', 58: 'Bb6', 59: 'B6', 60: 'C7'}
+
+    note_positions2 = {0: 'C2', 1: 'C#2', 2: 'D2', 3: 'D#2', 4: 'E2', 5: 'F2', 6: 'F#2', 7: 'G2', 
+    8: 'G#2', 9: 'A2', 10: 'A#2', 11: 'B2', 12: 'C3', 13: 'C#3', 14: 'D3', 15: 'D#3', 
+    16: 'E3', 17: 'F3', 18: 'F#3', 19: 'G3', 20: 'G#3', 21: 'A3', 22: 'A#3', 23: 'B3', 
+    24: 'C4', 25: 'C#4', 26: 'D4', 27: 'D#4', 28: 'E4', 29: 'F4', 30: 'F#4', 31: 'G4', 
+    32: 'G#4', 33: 'A4', 34: 'A#4', 35: 'B4', 36: 'C5', 37: 'C#5', 38: 'D5', 39: 'D#5', 
+    40: 'E5', 41: 'F5', 42: 'F#5', 43: 'G5', 44: 'G#5', 45: 'A5', 46: 'A#5', 47: 'B5', 
+    48: 'C6', 49: 'C#6', 50: 'D6', 51: 'D#6', 52: 'E6', 53: 'F6', 54: 'F#6', 55: 'G6', 
+    56: 'G#6', 57: 'A6', 58: 'A#6', 59: 'B6', 60: 'C7'}
+
+    # 獲取和弦中的音符，並將升號符號統一為'#'
+    #chord_notes = [str(note).replace('♯', '#') for note in chord_notes] if chord_notes else []
+    
+    # 打印和弦音符，用於調試
+    print("Chord notes:", chord_notes)
+
+    # 首先繪製所有白鍵
+    white_key_count = 0
+    for i in range(total_keys):
+        note = i % 12
+        note_name1 = list(note_positions1.values())[i]
+        note_name2 = list(note_positions2.values())[i]
+        if note in white_key_pattern:
+            # 計算白鍵的x坐標
+            x = white_key_count * key_width
+            # 決定填充顏色
+            fill_color = "lightgreen" if (note_name1 in chord_notes or note_name2 in chord_notes) else "white"
+            # 繪製白鍵
+            draw_key(x, 0, key_width, white_key_height, False, fill_color)
+            # 如果是和弦中的音符，在鍵上繪製音符名稱
+            if (note_name1 in chord_notes or note_name2 in chord_notes):
+                ctx.fillStyle = "black"
+                ctx.font = "12px Arial"
+                # can also use note_name2
+                ctx.fillText(note_name1, x + 2, white_key_height - 5)
+            white_key_count += 1
+
+    # 然後繪製所有黑鍵
+    black_key_count = 0
+    for i in range(total_keys):
+        note = i % 12
+        note_name1 = list(note_positions1.values())[i]
+        note_name2 = list(note_positions2.values())[i]
+        if note in black_key_pattern:
+            # 計算黑鍵的x坐標
+            x = (black_key_count + 1) * key_width - key_width // 4
+            # 決定填充顏色
+            fill_color = "lightgreen" if (note_name1 in chord_notes  or note_name2 in chord_notes) else "black"
+            # 繪製黑鍵
+            draw_key(x, 0, key_width // 2, black_key_height, True, fill_color)
+            # 如果是和弦中的音符，在鍵上繪製音符名稱
+            if (note_name1 in chord_notes or note_name2 in chord_notes):
+                ctx.fillStyle = "white"
+                ctx.font = "10px Arial"
+                # can also use note_name2
+                ctx.fillText(note_name1, x + 1, black_key_height - 5)
+            black_key_count += 1
+        elif note == 4 or note == 11:
+            black_key_count += 1
+
+# 使用 get_notes 轉換
+chord = Chord(Note('C'), '7').notes
+chord_notes = get_notes(chord)
+#print(chord_notes)
+
+# 繪製鍵盤並將和弦對應鍵塗為淡綠色
+draw_keyboard(chord_notes)
